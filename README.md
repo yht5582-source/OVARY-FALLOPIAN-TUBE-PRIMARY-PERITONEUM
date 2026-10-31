@@ -1,6 +1,6 @@
 # 卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學
 
-繁體中文互動教學網站，涵蓋 FIGO 分期、侵襲性上皮性癌的診斷與手術決策、BRCA／HRD、一線維持及復發治療，並提供六個示範病例和十題附解析考題。
+繁體中文互動教學網站，涵蓋 FIGO 分期、侵襲性上皮性癌的診斷與手術決策、BRCA／HRD、一線維持及復發治療，並提供六個示範病例、基礎 10 題與高階 10 題附解析考題。
 
 網站：https://yht5582-source.github.io/OVARY-FALLOPIAN-TUBE-PRIMARY-PERITONEUM/
 
@@ -15,5 +15,17 @@
 - [ESMO 2026 Express Update](https://pmc.ncbi.nlm.nih.gov/articles/PMC12947637/)
 - [NCI PDQ：卵巢／輸卵管／腹膜癌](https://www.cancer.gov/types/ovarian/hp/ovarian-epithelial-treatment-pdq)
 - [FIGO 共用分期原始文獻](https://pmc.ncbi.nlm.nih.gov/articles/PMC4397237/)
+
+## 檔案
+
+- `index.html`、`style.css`、`app.js`：頁面與互動（一般 script，可直接以 file:// 開啟）
+- `clinical.js`：教學分流引擎 `OV.pathway()`、病例與題庫
+- 測試：`node --test tests/clinical.test.cjs`
+
+## v2.0（2026-10-31）
+
+- 決策分流依 ASCO 2025 NACT、ASCO 2026 PARP／復發 Living Guideline、ESMO 2026 Express Update 重寫：尚無病理時 PCS 可進行、NACT 須先切片；ICS ≤4 療程、HIPEC、NACT 中進展；一線維持需 NED／CR／PR，olaparib＋bevacizumab 只在一線用過 bevacizumab；HRD 陰性 ASCO／ESMO 並列；復發 PARP 維持限制、二次減積、mirvetuximab 條件（高級別、FRα ≥75% 2+／3+、既往 1–3 線）。
+- 修正：考題正解位置原為固定循環（B、C、A…）→ 改為隨機；`<option hidden>` 在 iOS Safari 無效 → 改為晶片按鈕並依階段顯示欄位；隱藏欄位的值不再影響結果；結果即時更新；FIGO IC2 補上「表面腫瘤」。
+- 新增高階 10 題（FIGO 子期、HIPEC、NACT 進展、PARP 組合與復發限制、二次減積），計分與進度條，病例可帶入互動決策，快速情境、FIGO 子期階梯、深色模式、複製摘要。
 
 資料核對：2026-10-31。
