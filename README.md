@@ -28,4 +28,9 @@
 - 修正：考題正解位置原為固定循環（B、C、A…）→ 改為隨機；`<option hidden>` 在 iOS Safari 無效 → 改為晶片按鈕並依階段顯示欄位；隱藏欄位的值不再影響結果；結果即時更新；FIGO IC2 補上「表面腫瘤」。
 - 新增高階 10 題（FIGO 子期、HIPEC、NACT 進展、PARP 組合與復發限制、二次減積），計分與進度條，病例可帶入互動決策，快速情境、FIGO 子期階梯、深色模式、複製摘要。
 
+## v2.1（2026-10-31）
+
+- 新增「台灣健保給付檢核」：逐條比對《全民健康保險藥品給付規定》第九節 抗癌瘤藥物（115.9.22 更新）— 9.2 carboplatin、9.4 gemcitabine、9.5.1 paclitaxel、9.14 PLD、9.16.1 topotecan、9.37.3 bevacizumab、9.85.1 olaparib／niraparib；rucaparib、mirvetuximab 無條文。
+- 互動決策結果分列「國際規範」與「台灣規範」。
+
 資料核對：2026-10-31。

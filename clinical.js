@@ -152,5 +152,77 @@ const quizAdvanced=[
 {q:'鉑類敏感首次復發，單一骨盆病灶，前次手術完整切除，ECOG 0，腹水 <500 mL。關於手術，何者符合 ASCO 2026？',options:['可討論二次減積手術；復發時 HIPEC 證據不足','一律建議二次減積加 HIPEC','復發後不可再手術','只在鉑類抗性時考慮手術'],answer:0,explain:'ASCO 2026：證據不足以常規建議二次減積或 HIPEC，但鉑類敏感且高度可能完整切除者可討論二次減積（例如符合 AGO 評分：ECOG 0、腹水 <500 mL、初次手術完整切除）。',src:'relapse'}
 ];
 
-root.OV={pathway,cases,quiz,quizAdvanced,SRC};
+/* 台灣健保：全民健康保險藥品給付規定 第九節 抗癌瘤藥物（115.9.22 更新版）逐條比對 */
+const NHI_VERSION='第九節 抗癌瘤藥物（115.9.22 更新）';
+const NHI_URL='https://www.nhi.gov.tw/ch/cp-7593-ad2a9-3397-1.html';
+/* d: setting first|maint|recur; stage early|iii|iv; surgery pcs|nact; response yes|no;
+   biomarker brca|hrd|negative|unknown; bev yes|no; pfi lt6|6to12|gt12; priorBev yes|no */
+function nhi(input){
+  const d=Object.assign({setting:'maint',stage:'iii',surgery:'pcs',response:'yes',biomarker:'unknown',bev:'no',pfi:'6to12',priorBev:'no'},input||{});
+  const rows=[],notes=[];
+  const adv=d.stage==='iii'||d.stage==='iv';
+  const row=(drug,clause,status,text)=>rows.push({drug,clause,status,text});
+  if(d.setting==='first'){
+    row('Carboplatin','9.2','covered','9.2 第 1 款：卵巢癌患者（輸卵管、原發性腹膜癌依同一臨床處置，申報前確認診斷碼）。');
+    row('Paclitaxel','9.5.1','covered','9.5.1 第 1 款：給付癌別含卵巢癌。注意 Genetaxyl Crem Less 與 Taxol 兩品項限晚期卵巢癌一線「與 cisplatin 併用」。');
+    if(d.stage!=='iv')row('Bevacizumab','9.37.3','no','9.37.3(1) 一線限「第四期」且接受初次手術切除後；'+(adv?'III 期':'早期')+'不給付，需自費。');
+    else if(d.surgery==='pcs')row('Bevacizumab','9.37.3','covered','9.37.3(1)：第四期、初次手術切除後，術後一個月起與 carboplatin＋paclitaxel 併用 5 個療程，接續單用 9 個、再 8 個療程，總計上限 22 個療程（Zirabev 除外）。需事前審查，續用須以影像等證據證實無惡化；惡化或停藥後復發不得再申請。');
+    else row('Bevacizumab','9.37.3','check','9.37.3(1) 條文為「接受初次手術切除後之第一線治療」；新輔助化療後間隔減積是否符合，申請前請與健保窗口確認。');
+    if(d.stage==='iv'&&d.biomarker==='brca')notes.push('第四期 BRCA 變異：若一線後已申請 niraparib 維持，不得再申請 bevacizumab 併用（9.37.3(5)、9.85.1(8)）；僅 niraparib 耐受不良時可改 bevacizumab 單用，總上限 17 個療程。');
+    notes.push('診斷時即送 BRCA（及 BRCA 陰性時 HRD）檢測：9.85 PARP 抑制劑事前審查必須檢附檢測報告。');
+    return {version:NHI_VERSION,rows,notes};
+  }
+  if(d.setting==='maint'){
+    const resp=d.response==='yes';
+    const why=[];if(!adv)why.push('限 FIGO III–IV 期');if(!resp)why.push('需對一線含鉑化療有反應');
+    const block=why.join('、');
+    row('Olaparib 單藥','9.85.1(1)',block?'no':d.biomarker==='brca'?'covered':d.biomarker==='unknown'?'check':'no',
+      block?'不符合：'+block+'。':d.biomarker==='brca'?'符合：一線含鉑化療有反應、胚系或體細胞 BRCA1/2 致病變異、FIGO III–IV 期。限用 2 年；事前審查每次 6 個月，初次附 BRCA 報告。':d.biomarker==='unknown'?'須檢附 BRCA1/2 致病變異報告。':'限 BRCA1/2 致病或疑似致病變異；BRCA 野生型不給付。');
+    const niraOK=d.biomarker==='brca'||d.biomarker==='hrd';
+    row('Niraparib 單藥','9.85.1(2)',block?'no':niraOK?'covered':d.biomarker==='unknown'?'check':'no',
+      block?'不符合：'+block+'。':niraOK?'符合：一線含鉑化療有反應、'+(d.biomarker==='brca'?'BRCA1/2 致病變異':'HRD 陽性且 BRCA 野生型之高度惡性腫瘤')+'、FIGO III–IV 期。健保限用 2 年（PRIMA 試驗為 3 年）。劑量：體重 ≥77 kg 且血小板 ≥15 萬 每日最多 300 mg，否則 200 mg。':d.biomarker==='unknown'?'須檢附 BRCA 或 HRD 陽性報告。':'HRD 陰性不給付（ESMO 2026 雖列為選項，需自費）。');
+    const comboOK=!block&&d.bev==='yes'&&niraOK;
+    row('Olaparib＋bevacizumab','9.85.1(3)／9.37.3(3)',comboOK?'covered':block||d.bev==='no'||d.biomarker==='negative'?'no':'check',
+      comboOK?'符合：成人、對一線含鉑化療合併 bevacizumab 有完全或部分反應、HRD（BRCA 致病變異或基因體不穩定）。olaparib 限用 2 年、bevacizumab 以 15 個月為上限；bevacizumab 限 Alymsys、Abevmy、Vegzelma 或 Mvasi。併用不耐受可改 olaparib 單用，總療程合併計 2 年。'
+        :block?'不符合：'+block+'。':d.bev==='no'?'限一線含鉑化療「合併 bevacizumab」後有反應者；一線未用 bevacizumab 不適用。':d.biomarker==='negative'?'限 HRD（BRCA 變異或基因體不穩定）；HRD 陰性不給付。':'須檢附 BRCA 或 HRD（基因體不穩定）報告。');
+    row('Rucaparib','—','none','第九節無 rucaparib 卵巢癌給付規定（ATHENA-MONO 為 ESMO 2026 選項），需自費並確認國內可取得性。');
+    if(d.bev==='yes')row('Bevacizumab 單用維持','9.37.3(1)',d.stage==='iv'?'covered':'no',d.stage==='iv'?'第四期初次手術後的一線療程內，接續單用維持（總計上限 22 個療程）。':'一線 bevacizumab 給付限第四期；III 期自費使用者，接續維持亦不在給付範圍。');
+    if(d.biomarker==='brca'&&!block)notes.push('BRCA 變異時 olaparib 與 niraparib 僅能擇一，除耐受不良不得互換（9.85.1(5)）。');
+    notes.push('9.85 只給付「一線含鉑化療後」維持；復發後的 PARP 維持不在條文內。');
+    return {version:NHI_VERSION,rows,notes};
+  }
+  // 復發
+  row('Carboplatin','9.2','covered','9.2 第 1 款：卵巢癌患者。');
+  row('Paclitaxel','9.5.1','covered','9.5.1 第 1 款：給付癌別含卵巢癌（Genetaxyl Crem Less、Taxol 兩品項限一線與 cisplatin 併用）。');
+  row('Gemcitabine','9.4','covered','9.4：依許可證適應症給付於卵巢癌。');
+  row('PLD（Lipo-Dox、Caelyx）','9.14','covered','9.14 第 1 款：曾接受第一線含 platinum 及 paclitaxel 化療失敗或再復發之進行性或轉移性卵巢癌。');
+  row('Topotecan 注射劑','9.16.1','covered','9.16.1 第 1 款：卵巢癌第二線化療（第一線須含白金化合物）。');
+  const bevOK=d.pfi==='6to12'&&d.priorBev==='no';
+  row('Bevacizumab','9.37.3(2)',bevOK?'covered':'no',
+    bevOK?'符合：一線含鉑化療後 6–12 個月內復發、一線未曾申請 bevacizumab；與 carboplatin＋paclitaxel 併用後接續單用。每次申請 5 個療程，總上限 15 個療程，需事前審查。'
+      :d.priorBev==='yes'?'9.37.3(2)-Ⅰ：一線曾申請 bevacizumab 者不可再次使用。'
+      :d.pfi==='lt6'?'條文限一線含鉑化療後 6–12 個月內復發；鉑類抗性（<6 個月）合併化療（AURELIA）不給付。'
+      :'條文限 6–12 個月內復發；>12 個月復發字面上不符合，申請前請與健保窗口確認。');
+  row('PARP 抑制劑維持','9.85.1','no','9.85.1 只給付一線含鉑化療後維持；復發後 PARP 維持（ASCO 2026 限未用過 PARP 的 BRCA 變異者）需自費。');
+  row('Mirvetuximab soravtansine','—','none','第九節無此藥給付規定（ASCO 2026 強烈建議用於 FRα 高表現鉑類抗性高級別疾病），需自費或專案並確認國內可取得性。');
+  if(d.pfi==='lt6')notes.push('鉑類抗性：可給付的非鉑選項為 PLD（9.14）、topotecan（9.16.1）、paclitaxel、gemcitabine；bevacizumab 合併、mirvetuximab、relacorilant 皆不在條文內。');
+  else notes.push('鉑類敏感：carboplatin 合併 paclitaxel／PLD／gemcitabine 皆可給付；bevacizumab 只搭配 carboplatin＋paclitaxel 且限 6–12 個月內復發。');
+  return {version:NHI_VERSION,rows,notes};
+}
+const NHI_SUMMARY={
+  pcs:'carboplatin＋paclitaxel 給付；一線 bevacizumab 限第四期初次手術後（9.37.3(1)，上限 22 療程）。',
+  nact:'carboplatin＋paclitaxel 給付；一線 bevacizumab 條文為「初次手術切除後」第四期，新輔助化療者需確認。',
+  'nact-biopsy':'carboplatin＋paclitaxel 給付；PARP 維持事前審查需 BRCA／HRD 報告，診斷時即送檢。',
+  assess:'PARP 維持事前審查需 BRCA／HRD 報告（9.85.1(4)），診斷時即送檢。',
+  brca:'olaparib 或 niraparib 單藥（9.85.1(1)(2)，III–IV 期、限 2 年、事前審查，二擇一）；一線用過 bevacizumab 可給付 olaparib＋bevacizumab（9.85.1(3)）。',
+  hrd:'niraparib 單藥給付（9.85.1(2)，限 2 年）；olaparib 單藥限 BRCA；一線用過 bevacizumab 可給付 olaparib＋bevacizumab。',
+  'hrd-neg':'HRD 陰性 PARP 維持不給付；rucaparib 無條文；bevacizumab 維持只在第四期初次手術後的一線療程內。',
+  'early-maint':'9.85 PARP 抑制劑限 FIGO III–IV 期。',
+  'plat-sens':'含鉑雙藥皆給付；bevacizumab 限 6–12 個月內復發、一線未用過、搭配 carboplatin＋paclitaxel（9.37.3(2)）；復發 PARP 維持不給付。',
+  'plat-res':'PLD（9.14）、topotecan（9.16.1）可給付；bevacizumab 合併化療與 mirvetuximab 不給付。',
+  mirv:'mirvetuximab 第九節無給付規定，需自費；PLD、topotecan 可給付。'
+};
+function nhiSummary(code){return NHI_SUMMARY[code]?'健保第九節（115.9.22）：'+NHI_SUMMARY[code]:'';}
+
+root.OV={pathway,cases,quiz,quizAdvanced,SRC,nhi,nhiSummary,NHI_VERSION,NHI_URL};
 })(typeof globalThis!=='undefined'?globalThis:this);

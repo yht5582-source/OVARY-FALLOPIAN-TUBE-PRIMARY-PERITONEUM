@@ -1,6 +1,6 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="卵巢癌、輸卵管癌與原發性腹膜癌：FIGO 2014 分期、減積手術、BRCA／HRD 維持治療與復發處置互動教學"><meta name="theme-color" content="#173c4e"><title>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23173c4e%22/%3E%3Ctext x=%2250%22 y=%2272%22 font-size=%2266%22 text-anchor=%22middle%22 font-family=%22Georgia%22 fill=%22%23e7b080%22%3EO%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css?v=2.0"></head><body>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="卵巢癌、輸卵管癌與原發性腹膜癌：FIGO 2014 分期、減積手術、BRCA／HRD 維持治療與復發處置互動教學"><meta name="theme-color" content="#173c4e"><title>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23173c4e%22/%3E%3Ctext x=%2250%22 y=%2272%22 font-size=%2266%22 text-anchor=%22middle%22 font-family=%22Georgia%22 fill=%22%23e7b080%22%3EO%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css?v=2.1"></head><body>
 <a class="skip" href="#main">跳到主要內容</a>
-<header><a class="brand" href="#top">OVARIAN <span>ONCOLOGY</span></a><nav aria-label="主選單"><a href="#framework">分期</a><a href="#pathway">決策</a><a href="#cases">病例</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav></header>
+<header><a class="brand" href="#top">OVARIAN <span>ONCOLOGY</span></a><nav aria-label="主選單"><a href="#framework">分期</a><a href="#pathway">決策</a><a href="#nhi">健保</a><a href="#cases">病例</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav></header>
 <main id="main">
 <section class="hero" id="top"><div class="hero-copy"><p class="eyebrow">OVARY · FALLOPIAN TUBE · PRIMARY PERITONEUM</p><h1>同一個分期系統，<br><em>每一步都要分層。</em></h1><p class="lead">從病理、FIGO 期別、完整減積的可能性，到 BRCA／HRD 與鉑類反應，練習婦癌多專科的治療決策。</p><div class="hero-actions"><a class="cta" href="#pathway">開始教學決策 →</a><a class="cta ghost-dark" href="#quiz">直接做測驗</a></div>
 <ol class="flow" aria-label="治療流程"><li><b>DIAGNOSE</b>組織＋分期</li><li><b>CYTOREDUCE</b>PCS 或 NACT→ICS</li><li><b>PERSONALIZE</b>BRCA／HRD 維持</li><li><b>RELAPSE</b>鉑類適用性</li></ol></div>
@@ -66,22 +66,56 @@
 <div class="form-actions"><button type="reset" class="ghost">重設</button></div></form>
 <div class="result-col"><div id="result" class="result" aria-live="polite"></div><button type="button" id="copy-result" class="ghost copy">複製摘要</button></div></div></div></section>
 
-<section id="cases" class="section"><p class="eyebrow">03 / CASE LIBRARY</p><h2>六個示範病例</h2><p class="muted">作答後可把病例帶入互動決策，比對完整路徑。</p><div id="case-list" class="case-grid"></div></section>
+<section id="nhi" class="section nhi"><p class="eyebrow">03 / TAIWAN NHI</p><h2>台灣健保給付檢核</h2><p class="muted">逐條比對《全民健康保險藥品給付規定》第九節 抗癌瘤藥物（115.9.22 更新）。綠色為條文明列，黃色需申報前確認，紅色為未給付，灰色為無條文。實際以健保署最新公告及事前審查結果為準。</p>
+<div class="nhi-grid"><form id="nhi-form">
+<fieldset><legend>治療階段</legend><div class="chips">
+<label><input type="radio" name="setting" value="first"><span>一線化療</span></label>
+<label><input type="radio" name="setting" value="maint" checked><span>一線後維持</span></label>
+<label><input type="radio" name="setting" value="recur"><span>復發</span></label></div></fieldset>
+<fieldset id="n-stage"><legend>FIGO 期別</legend><div class="chips">
+<label><input type="radio" name="stage" value="early"><span>I–II 期</span></label>
+<label><input type="radio" name="stage" value="iii" checked><span>III 期</span></label>
+<label><input type="radio" name="stage" value="iv"><span>IV 期</span></label></div></fieldset>
+<fieldset id="n-surgery"><legend>手術順序</legend><div class="chips">
+<label><input type="radio" name="surgery" value="pcs" checked><span>初次減積手術</span></label>
+<label><input type="radio" name="surgery" value="nact"><span>新輔助化療→間隔減積</span></label></div></fieldset>
+<fieldset id="n-response"><legend>一線含鉑化療反應</legend><div class="chips">
+<label><input type="radio" name="response" value="yes" checked><span>完全／部分反應</span></label>
+<label><input type="radio" name="response" value="no"><span>無反應</span></label></div></fieldset>
+<fieldset id="n-bev"><legend>一線合併 bevacizumab</legend><div class="chips">
+<label><input type="radio" name="bev" value="yes"><span>有</span></label>
+<label><input type="radio" name="bev" value="no" checked><span>沒有</span></label></div></fieldset>
+<fieldset id="n-bio"><legend>BRCA／HRD 報告</legend><div class="chips">
+<label><input type="radio" name="biomarker" value="brca"><span>BRCA1/2 變異</span></label>
+<label><input type="radio" name="biomarker" value="hrd"><span>BRCA 野生型 HRD 陽性</span></label>
+<label><input type="radio" name="biomarker" value="negative"><span>HRD 陰性</span></label>
+<label><input type="radio" name="biomarker" value="unknown" checked><span>尚無報告</span></label></div></fieldset>
+<fieldset id="n-pfi"><legend>距一線含鉑化療結束</legend><div class="chips">
+<label><input type="radio" name="pfi" value="lt6"><span>&lt;6 個月</span></label>
+<label><input type="radio" name="pfi" value="6to12" checked><span>6–12 個月</span></label>
+<label><input type="radio" name="pfi" value="gt12"><span>&gt;12 個月</span></label></div></fieldset>
+<fieldset id="n-priorbev"><legend>一線曾申請 bevacizumab</legend><div class="chips">
+<label><input type="radio" name="priorBev" value="yes"><span>是</span></label>
+<label><input type="radio" name="priorBev" value="no" checked><span>否</span></label></div></fieldset>
+</form><div><div id="nhi-result" class="nhi-table" aria-live="polite"></div><div id="nhi-notes"></div></div></div></section>
 
-<section id="quiz" class="section quiz"><div class="wrap narrow"><p class="eyebrow">04 / KNOWLEDGE CHECK</p><h2>臨床測驗</h2>
+<section id="cases" class="section"><p class="eyebrow">04 / CASE LIBRARY</p><h2>六個示範病例</h2><p class="muted">作答後可把病例帶入互動決策，比對完整路徑。</p><div id="case-list" class="case-grid"></div></section>
+
+<section id="quiz" class="section quiz"><div class="wrap narrow"><p class="eyebrow">05 / KNOWLEDGE CHECK</p><h2>臨床測驗</h2>
 <div class="chips quiz-mode" role="radiogroup" aria-label="測驗難度"><label><input type="radio" name="quiz-mode" value="basic" checked><span>基礎 10 題<small>分期與核心觀念</small></span></label><label><input type="radio" name="quiz-mode" value="advanced"><span>高階 10 題<small>FIGO 子期、HIPEC、PARP 細節、mirvetuximab</small></span></label><label><input type="radio" name="quiz-mode" value="all"><span>全部 20 題</span></label></div>
 <p class="muted">選擇答案後立即查看解析；題目為虛構教學情境，選項順序每次隨機。</p>
 <div class="progress" aria-hidden="true"><span id="quiz-bar"></span></div><p id="quiz-score" class="score" aria-live="polite"></p>
 <div id="quiz-list"></div><button id="reset-quiz" type="button" class="secondary">重做考題</button></div></section>
 
-<section id="sources" class="section sources"><p class="eyebrow">05 / GUIDELINES</p><h2>原始指引與版本</h2><ul>
+<section id="sources" class="section sources"><p class="eyebrow">06 / GUIDELINES</p><h2>原始指引與版本</h2><ul>
 <li><span class="kind">ASCO</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11934100/" target="_blank" rel="noopener">Neoadjuvant Chemotherapy for Advanced Ovarian Cancer：ASCO Guideline Update 2025 ↗</a></li>
 <li><span class="kind">ASCO</span><a href="https://ascopubs.org/doi/10.1200/JCO-26-02412" target="_blank" rel="noopener">PARP Inhibitors：ASCO Living Guideline 2026.1.0 ↗</a></li>
 <li><span class="kind">ASCO</span><a href="https://ascopubs.org/doi/10.1200/JCO-26-01591" target="_blank" rel="noopener">Systemic Treatment of Recurrence：ASCO Living Guideline 2026.1.0 ↗</a></li>
 <li><span class="kind">ESMO</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12947637/" target="_blank" rel="noopener">ESMO Clinical Practice Guideline Express Update 2026 ↗</a></li>
 <li><span class="kind">ESGO</span><a href="https://www.esgo.org/media/2025/08/Pocket-Guidelines_Ovarian-cancer-consensus.pdf" target="_blank" rel="noopener">ESGO–ESMO–ESP 卵巢癌共識口袋版 ↗</a></li>
 <li><span class="kind">NCI</span><a href="https://www.cancer.gov/types/ovarian/hp/ovarian-epithelial-treatment-pdq" target="_blank" rel="noopener">NCI PDQ：Ovarian Epithelial, Fallopian Tube, and Primary Peritoneal Cancer Treatment ↗</a></li>
+<li><span class="kind">健保</span><a href="https://www.nhi.gov.tw/ch/cp-7593-ad2a9-3397-1.html" target="_blank" rel="noopener">健保署：藥品給付規定（第九節 抗癌瘤藥物，115.9.22）↗</a></li>
 <li><span class="kind">FIGO</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4397237/" target="_blank" rel="noopener">FIGO 2014 卵巢、輸卵管、腹膜癌分期 ↗</a></li></ul>
-<p>資料核對：2026-10-31。ASCO 2026 與 ESMO 2026 對 HRD 陰性的一線 PARP 維持建議不同，頁面兩者並列並標示來源。此頁未判定台灣健保給付資格。</p></section></main>
-<footer>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學 <span>醫療人員教學用途 · v2.0 · 2026-10-31</span></footer>
-<script src="clinical.js?v=2.0" defer></script><script src="app.js?v=2.0" defer></script></body></html>
+<p>資料核對：2026-10-31。ASCO 2026 與 ESMO 2026 對 HRD 陰性的一線 PARP 維持建議不同，頁面兩者並列並標示來源。台灣健保欄位依第九節條文整理（9.2、9.4、9.5.1、9.14、9.16.1、9.37.3、9.85.1），不代表事前審查結果。</p></section></main>
+<footer>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學 <span>醫療人員教學用途 · v2.1 · 2026-10-31</span></footer>
+<script src="clinical.js?v=2.1" defer></script><script src="app.js?v=2.1" defer></script></body></html>

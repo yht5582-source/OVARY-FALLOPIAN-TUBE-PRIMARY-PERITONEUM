@@ -93,3 +93,47 @@ test('quiz banks: 10 basic + 10 advanced, valid answers and sources',()=>{
 test('case presets land on the intended pathway',()=>{
   assert.deepEqual(cases.map(c=>pathway(c.preset).code),['nact-biopsy','pcs','nact','brca','hrd-neg','mirv']);
 });
+
+const {nhi,nhiSummary}=globalThis.OV;
+const st=(r,drug)=>r.rows.find(x=>x.drug===drug).status;
+
+test('NHI first-line bevacizumab: stage IV after primary surgery only',()=>{
+  assert.equal(st(nhi({setting:'first',stage:'iv',surgery:'pcs'}),'Bevacizumab'),'covered');
+  assert.equal(st(nhi({setting:'first',stage:'iv',surgery:'nact'}),'Bevacizumab'),'check');
+  assert.equal(st(nhi({setting:'first',stage:'iii'}),'Bevacizumab'),'no');
+  assert.match(nhi({setting:'first',stage:'iv',biomarker:'brca'}).notes.join(' '),/17 個療程/);
+});
+
+test('NHI maintenance: olaparib BRCA only, niraparib BRCA/HRD+, 2 years',()=>{
+  const b=nhi({setting:'maint',stage:'iii',response:'yes',biomarker:'brca'});
+  assert.equal(st(b,'Olaparib 單藥'),'covered');assert.equal(st(b,'Niraparib 單藥'),'covered');
+  const h=nhi({setting:'maint',stage:'iii',response:'yes',biomarker:'hrd'});
+  assert.equal(st(h,'Olaparib 單藥'),'no');assert.equal(st(h,'Niraparib 單藥'),'covered');
+  assert.match(h.rows.find(x=>x.drug==='Niraparib 單藥').text,/限用 2 年/);
+  const n=nhi({setting:'maint',stage:'iii',response:'yes',biomarker:'negative'});
+  assert.ok(['Olaparib 單藥','Niraparib 單藥','Olaparib＋bevacizumab'].every(k=>st(n,k)==='no'));
+  assert.equal(st(nhi({setting:'maint',stage:'early',response:'yes',biomarker:'brca'}),'Olaparib 單藥'),'no');
+  assert.equal(st(nhi({setting:'maint',stage:'iv',response:'no',biomarker:'brca'}),'Niraparib 單藥'),'no');
+  assert.equal(st(nhi({setting:'maint',biomarker:'unknown'}),'Niraparib 單藥'),'check');
+});
+
+test('NHI olaparib+bevacizumab needs first-line bevacizumab and HRD',()=>{
+  assert.equal(st(nhi({setting:'maint',bev:'yes',biomarker:'hrd'}),'Olaparib＋bevacizumab'),'covered');
+  assert.equal(st(nhi({setting:'maint',bev:'no',biomarker:'hrd'}),'Olaparib＋bevacizumab'),'no');
+  assert.equal(st(nhi({setting:'maint',bev:'yes',biomarker:'negative'}),'Olaparib＋bevacizumab'),'no');
+});
+
+test('NHI recurrence: bevacizumab only 6–12 months and no prior first-line bev',()=>{
+  assert.equal(st(nhi({setting:'recur',pfi:'6to12',priorBev:'no'}),'Bevacizumab'),'covered');
+  assert.equal(st(nhi({setting:'recur',pfi:'6to12',priorBev:'yes'}),'Bevacizumab'),'no');
+  assert.equal(st(nhi({setting:'recur',pfi:'lt6'}),'Bevacizumab'),'no');
+  assert.equal(st(nhi({setting:'recur',pfi:'gt12'}),'Bevacizumab'),'no');
+  const r=nhi({setting:'recur',pfi:'lt6'});
+  assert.equal(st(r,'PLD（Lipo-Dox、Caelyx）'),'covered');assert.equal(st(r,'Topotecan 注射劑'),'covered');
+  assert.equal(st(r,'Mirvetuximab soravtansine'),'none');assert.equal(st(r,'PARP 抑制劑維持'),'no');
+});
+
+test('every pathway code with a Taiwan summary resolves; others empty',()=>{
+  for(const c of ['pcs','nact','nact-biopsy','assess','brca','hrd','hrd-neg','early-maint','plat-sens','plat-res','mirv'])assert.match(nhiSummary(c),/^健保第九節（115.9.22）：/);
+  assert.equal(nhiSummary('nonEpi'),'');
+});

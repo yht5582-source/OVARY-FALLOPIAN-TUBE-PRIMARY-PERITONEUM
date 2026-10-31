@@ -47,8 +47,9 @@ function renderPath(){
   const d=readForm();syncFields(d);
   const r=OV.pathway(visibleData(d));
   result.className='result '+TONE[r.tone];
-  lastText=[`【卵巢癌教學決策】${r.label}`,r.title,...r.points.map(x=>'・'+x),...r.warnings.map(w=>'⚠ '+w),'對照：'+r.links.map(l=>l[0]).join('、'),'（教學用途，非個別醫療建議）'].join('\n');
-  result.innerHTML=`<p class="eyebrow">TUMOR BOARD PATHWAY · ${esc(r.label)}</p><h3>${esc(r.title)}</h3><ul>${r.points.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${r.warnings.map(w=>`<p class="warn">⚠ ${esc(w)}</p>`).join('')}<p class="result-sources">對照：${r.links.map(([l,u])=>`<a target="_blank" rel="noopener" href="${u}">${esc(l)} ↗</a>`).join(' · ')}</p><p class="small">教學提示；以完整病歷及婦癌多專科團隊決策為準。</p>`;
+  const tw=OV.nhiSummary(r.code);
+  lastText=[`【卵巢癌教學決策】${r.label}`,r.title,...r.points.map(x=>'・'+x),...r.warnings.map(w=>'⚠ '+w),...(tw?['台灣規範：'+tw]:[]),'國際規範：'+r.links.map(l=>l[0]).join('、'),'（教學用途，非個別醫療建議）'].join('\n');
+  result.innerHTML=`<p class="eyebrow">TUMOR BOARD PATHWAY · ${esc(r.label)}</p><h3>${esc(r.title)}</h3><ul>${r.points.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${r.warnings.map(w=>`<p class="warn">⚠ ${esc(w)}</p>`).join('')}${tw?`<p class="tw"><b>台灣規範</b>　${esc(tw)} <a href="#nhi">逐條檢核 →</a></p>`:''}<p class="result-sources"><b class="intl">國際規範</b>　${r.links.map(([l,u])=>`<a target="_blank" rel="noopener" href="${u}">${esc(l)} ↗</a>`).join(' · ')}</p><p class="small">教學提示；以完整病歷及婦癌多專科團隊決策為準。</p>`;
 }
 form.addEventListener('change',renderPath);
 form.addEventListener('submit',e=>{e.preventDefault();renderPath();});
@@ -58,6 +59,24 @@ $('#copy-result').addEventListener('click',async e=>{
   try{await navigator.clipboard.writeText(lastText);b.textContent='已複製 ✓';}catch{b.textContent='無法複製';}
   setTimeout(()=>b.textContent='複製摘要',1600);
 });
+
+// 台灣健保給付檢核
+const nhiForm=$('#nhi-form');
+const ST={covered:'條文明列',check:'需確認',no:'未給付',none:'無條文'};
+function renderNhi(){
+  const d=Object.fromEntries(new FormData(nhiForm));
+  const s=d.setting;
+  $('#n-surgery').hidden=s!=='first'||d.stage!=='iv';
+  $('#n-response').hidden=$('#n-bev').hidden=s!=='maint';
+  $('#n-stage').hidden=s==='recur';
+  $('#n-bio').hidden=s==='recur';
+  $('#n-pfi').hidden=$('#n-priorbev').hidden=s!=='recur';
+  const r=OV.nhi(d);
+  $('#nhi-result').innerHTML=r.rows.map(x=>`<div class="nhi-row st-${x.status}"><b>${esc(x.drug)}<span class="badge">${ST[x.status]}</span></b><span class="clause">${x.clause==='—'?'第九節無條文':'條文 '+esc(x.clause)}</span><p>${esc(x.text)}</p></div>`).join('');
+  $('#nhi-notes').innerHTML=r.notes.map(n=>`<p>${esc(n)}</p>`).join('');
+}
+nhiForm.addEventListener('change',renderNhi);
+renderNhi();
 
 // 目前段落的導覽高亮
 const navLinks=[...document.querySelectorAll('nav a')];
