@@ -1,6 +1,6 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="卵巢癌、輸卵管癌與原發性腹膜癌：FIGO 2014 分期、減積手術、BRCA／HRD 維持治療與復發處置互動教學"><meta name="theme-color" content="#173c4e"><title>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23173c4e%22/%3E%3Ctext x=%2250%22 y=%2272%22 font-size=%2266%22 text-anchor=%22middle%22 font-family=%22Georgia%22 fill=%22%23e7b080%22%3EO%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css?v=2.1"></head><body>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="卵巢癌、輸卵管癌與原發性腹膜癌：FIGO 2014 分期、減積手術、BRCA／HRD 維持治療與復發處置互動教學"><meta name="theme-color" content="#173c4e"><title>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23173c4e%22/%3E%3Ctext x=%2250%22 y=%2272%22 font-size=%2266%22 text-anchor=%22middle%22 font-family=%22Georgia%22 fill=%22%23e7b080%22%3EO%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css?v=2.2"></head><body>
 <a class="skip" href="#main">跳到主要內容</a>
-<header><a class="brand" href="#top">OVARIAN <span>ONCOLOGY</span></a><nav aria-label="主選單"><a href="#framework">分期</a><a href="#pathway">決策</a><a href="#nhi">健保</a><a href="#cases">病例</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav></header>
+<header><a class="brand" href="#top">OVARIAN <span>ONCOLOGY</span></a><nav aria-label="主選單"><a href="#framework">分期</a><a href="#pathway">決策</a><a href="#nhi">健保</a><a href="#cases">病例</a><a href="#map">心智圖</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav></header>
 <main id="main">
 <section class="hero" id="top"><div class="hero-copy"><p class="eyebrow">OVARY · FALLOPIAN TUBE · PRIMARY PERITONEUM</p><h1>同一個分期系統，<br><em>每一步都要分層。</em></h1><p class="lead">從病理、FIGO 期別、完整減積的可能性，到 BRCA／HRD 與鉑類反應，練習婦癌多專科的治療決策。</p><div class="hero-actions"><a class="cta" href="#pathway">開始教學決策 →</a><a class="cta ghost-dark" href="#quiz">直接做測驗</a></div>
 <ol class="flow" aria-label="治療流程"><li><b>DIAGNOSE</b>組織＋分期</li><li><b>CYTOREDUCE</b>PCS 或 NACT→ICS</li><li><b>PERSONALIZE</b>BRCA／HRD 維持</li><li><b>RELAPSE</b>鉑類適用性</li></ol></div>
@@ -101,13 +101,17 @@
 
 <section id="cases" class="section"><p class="eyebrow">04 / CASE LIBRARY</p><h2>六個示範病例</h2><p class="muted">作答後可把病例帶入互動決策，比對完整路徑。</p><div id="case-list" class="case-grid"></div></section>
 
-<section id="quiz" class="section quiz"><div class="wrap narrow"><p class="eyebrow">05 / KNOWLEDGE CHECK</p><h2>臨床測驗</h2>
+<section id="map" class="section map"><div class="wrap"><p class="eyebrow">05 / MIND MAP</p><h2>診斷與治療心智圖</h2><p class="muted">點分支展開重點；標「帶入」的項目會直接設定互動決策。每項附指引出處，綠色標籤為台灣健保條文。</p>
+<div class="mm-tools"><button type="button" id="mm-open" class="ghost">全部展開</button><button type="button" id="mm-close" class="ghost">全部收合</button></div>
+<div class="mm" id="mm"><svg id="mm-links" aria-hidden="true"></svg><div class="mm-side" id="mm-dx"></div><div class="mm-center" id="mm-center">卵巢<br>輸卵管<br>腹膜癌<small>FIGO 2014<br>ASCO · ESMO</small></div><div class="mm-side" id="mm-tx"></div></div></div></section>
+
+<section id="quiz" class="section quiz"><div class="wrap narrow"><p class="eyebrow">06 / KNOWLEDGE CHECK</p><h2>臨床測驗</h2>
 <div class="chips quiz-mode" role="radiogroup" aria-label="測驗難度"><label><input type="radio" name="quiz-mode" value="basic" checked><span>基礎 10 題<small>分期與核心觀念</small></span></label><label><input type="radio" name="quiz-mode" value="advanced"><span>高階 10 題<small>FIGO 子期、HIPEC、PARP 細節、mirvetuximab</small></span></label><label><input type="radio" name="quiz-mode" value="all"><span>全部 20 題</span></label></div>
 <p class="muted">選擇答案後立即查看解析；題目為虛構教學情境，選項順序每次隨機。</p>
 <div class="progress" aria-hidden="true"><span id="quiz-bar"></span></div><p id="quiz-score" class="score" aria-live="polite"></p>
 <div id="quiz-list"></div><button id="reset-quiz" type="button" class="secondary">重做考題</button></div></section>
 
-<section id="sources" class="section sources"><p class="eyebrow">06 / GUIDELINES</p><h2>原始指引與版本</h2><ul>
+<section id="sources" class="section sources"><p class="eyebrow">07 / GUIDELINES</p><h2>原始指引與版本</h2><ul>
 <li><span class="kind">ASCO</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11934100/" target="_blank" rel="noopener">Neoadjuvant Chemotherapy for Advanced Ovarian Cancer：ASCO Guideline Update 2025 ↗</a></li>
 <li><span class="kind">ASCO</span><a href="https://ascopubs.org/doi/10.1200/JCO-26-02412" target="_blank" rel="noopener">PARP Inhibitors：ASCO Living Guideline 2026.1.0 ↗</a></li>
 <li><span class="kind">ASCO</span><a href="https://ascopubs.org/doi/10.1200/JCO-26-01591" target="_blank" rel="noopener">Systemic Treatment of Recurrence：ASCO Living Guideline 2026.1.0 ↗</a></li>
@@ -116,6 +120,6 @@
 <li><span class="kind">NCI</span><a href="https://www.cancer.gov/types/ovarian/hp/ovarian-epithelial-treatment-pdq" target="_blank" rel="noopener">NCI PDQ：Ovarian Epithelial, Fallopian Tube, and Primary Peritoneal Cancer Treatment ↗</a></li>
 <li><span class="kind">健保</span><a href="https://www.nhi.gov.tw/ch/cp-7593-ad2a9-3397-1.html" target="_blank" rel="noopener">健保署：藥品給付規定（第九節 抗癌瘤藥物，115.9.22）↗</a></li>
 <li><span class="kind">FIGO</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4397237/" target="_blank" rel="noopener">FIGO 2014 卵巢、輸卵管、腹膜癌分期 ↗</a></li></ul>
-<p>資料核對：2026-10-31。ASCO 2026 與 ESMO 2026 對 HRD 陰性的一線 PARP 維持建議不同，頁面兩者並列並標示來源。台灣健保欄位依第九節條文整理（9.2、9.4、9.5.1、9.14、9.16.1、9.37.3、9.85.1），不代表事前審查結果。</p></section></main>
-<footer>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學 <span>醫療人員教學用途 · v2.1 · 2026-10-31</span></footer>
-<script src="clinical.js?v=2.1" defer></script><script src="app.js?v=2.1" defer></script></body></html>
+<p>資料核對：2026-10-31。ASCO 2026 與 ESMO 2026 對 HRD 陰性的一線 PARP 維持建議不同，頁面兩者並列並標示來源。台灣健保欄位依第九節條文整理（9.2、9.4、9.5.1、9.14、9.16.1、9.37.3、9.85.1），不代表事前審查結果。心智圖（2026-11-02）重述本頁互動決策與健保檢核的內容，未另加新建議。</p></section></main>
+<footer>卵巢癌・輸卵管癌・原發性腹膜癌｜臨床教學 <span>醫療人員教學用途 · v2.2 · 2026-11-02</span></footer>
+<script src="clinical.js?v=2.2" defer></script><script src="app.js?v=2.2" defer></script></body></html>

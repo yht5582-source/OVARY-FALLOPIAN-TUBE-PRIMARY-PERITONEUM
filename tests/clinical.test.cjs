@@ -137,3 +137,27 @@ test('every pathway code with a Taiwan summary resolves; others empty',()=>{
   for(const c of ['pcs','nact','nact-biopsy','assess','brca','hrd','hrd-neg','early-maint','plat-sens','plat-res','mirv'])assert.match(nhiSummary(c),/^健保第九節（115.9.22）：/);
   assert.equal(nhiSummary('nonEpi'),'');
 });
+
+test('mind map: well-formed, sources resolve, presets reach the stated route',()=>{
+  const {mindMap}=globalThis.OV;
+  assert.equal(mindMap.dx.length,6);assert.equal(mindMap.tx.length,9);
+  for(const b of [...mindMap.dx,...mindMap.tx]){
+    assert.ok(b.t&&b.s&&b.l.length>=3,b.t);
+    for(const x of b.l){
+      assert.ok(x.k&&x.x,b.t);
+      if(x.src)assert.ok(SRC[x.src],x.k);
+      if(x.p)assert.equal(pathway(x.p).code,x.c,x.k);else assert.equal(x.c,undefined,x.k);
+    }
+  }
+  assert.ok(mindMap.tx.find(b=>b.tw).l.every(x=>x.tw));
+});
+
+test('mind map: every NHI clause it cites exists in the NHI checker',()=>{
+  const {mindMap,nhi,nhiSummary}=globalThis.OV;
+  const all=[];
+  for(const setting of ['first','maint','recur'])for(const stage of ['early','iii','iv'])for(const biomarker of ['brca','hrd','negative','unknown'])all.push(nhi({setting,stage,biomarker,bev:'yes'}));
+  const hay=JSON.stringify(all)+['assess','brca','plat-res'].map(nhiSummary).join(' ');
+  const leaves=[...mindMap.dx,...mindMap.tx].flatMap(b=>b.l).filter(x=>x.tw);
+  assert.ok(leaves.length>=10);
+  for(const x of leaves)for(const c of x.x.match(/9\.\d+(\.\d+)?(\(\d\))?/g)||[])assert.ok(hay.includes(c),c);
+});

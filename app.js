@@ -114,6 +114,35 @@ function renderSet(items,target,kind){
   updateScore();
 }
 
+// 心智圖：分支預設收合，連線依實際位置繪製
+function mapBranch(b,side,i){
+  const leaf=x=>{const src=x.src&&OV.SRC[x.src];return `<li><b>${esc(x.k)}</b>　${esc(x.x)}${src?` <cite><a href="${src[1]}" target="_blank" rel="noopener">${esc(src[0])}</a></cite>`:''}${x.tw?' <span class="mm-tw">台灣健保</span>':''}${x.p?` <button type="button" class="mm-go" data-go='${esc(JSON.stringify(x.p))}'>帶入</button>`:''}</li>`;};
+  return `<div class="mm-branch ${side}"><button type="button" class="mm-head" aria-expanded="false" aria-controls="mm-${side}${i}"><span class="mm-t">${esc(b.t)}</span><span class="mm-s">${esc(b.s)}</span></button><ul class="mm-leaves" id="mm-${side}${i}" hidden>${b.l.map(leaf).join('')}</ul></div>`;
+}
+function drawMap(){
+  const w=$('#mm'),svg=$('#mm-links');
+  if(getComputedStyle(svg).display==='none')return;
+  const W=w.getBoundingClientRect(),C=$('#mm-center').getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${W.width} ${W.height}`);
+  svg.innerHTML=[...w.querySelectorAll('.mm-branch')].map(b=>{
+    const dx=b.classList.contains('dx'),r=b.querySelector('.mm-head').getBoundingClientRect();
+    const x1=(dx?C.left:C.right)-W.left,y1=C.top+C.height/2-W.top,x2=(dx?r.right:r.left)-W.left,y2=r.top+r.height/2-W.top,mx=(x1+x2)/2;
+    return `<path class="${dx?'dx':'tx'}" d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}"/>`;
+  }).join('');
+}
+function setBranch(h,open){h.setAttribute('aria-expanded',open);document.getElementById(h.getAttribute('aria-controls')).hidden=!open;}
+$('#mm-dx').innerHTML='<h3 class="mm-col dx">診斷與評估</h3>'+OV.mindMap.dx.map((b,i)=>mapBranch(b,'dx',i)).join('');
+$('#mm-tx').innerHTML='<h3 class="mm-col tx">治療</h3>'+OV.mindMap.tx.map((b,i)=>mapBranch(b,'tx',i)).join('');
+$('#mm').addEventListener('click',e=>{
+  const go=e.target.closest('.mm-go');if(go){applyPreset(JSON.parse(go.dataset.go));return;}
+  const h=e.target.closest('.mm-head');if(h){setBranch(h,h.getAttribute('aria-expanded')!=='true');drawMap();}
+});
+const mmAll=open=>{document.querySelectorAll('#mm .mm-head').forEach(h=>setBranch(h,open));drawMap();};
+$('#mm-open').addEventListener('click',()=>mmAll(true));
+$('#mm-close').addEventListener('click',()=>mmAll(false));
+if(window.ResizeObserver)new ResizeObserver(drawMap).observe($('#mm'));else addEventListener('resize',drawMap);
+drawMap();
+
 renderPath();
 renderSet(OV.cases,'#case-list','病例');
 const quizSet=()=>{const m=document.querySelector('input[name="quiz-mode"]:checked').value;return m==='advanced'?OV.quizAdvanced:m==='all'?OV.quiz.concat(OV.quizAdvanced):OV.quiz;};

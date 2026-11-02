@@ -224,5 +224,93 @@ const NHI_SUMMARY={
 };
 function nhiSummary(code){return NHI_SUMMARY[code]?'健保第九節（115.9.22）：'+NHI_SUMMARY[code]:'';}
 
-root.OV={pathway,cases,quiz,quizAdvanced,SRC,nhi,nhiSummary,NHI_VERSION,NHI_URL};
+/*MAP-START*/
+/* 葉節點重述本頁分流引擎與健保檢核內容；src = SRC 鍵；p = 帶入互動決策的輸入，c = 預期路徑代碼；tw = 台灣健保條文。 */
+const mindMap={
+  dx:[
+   {t:'初步評估',s:'不是只看 CA-125',l:[
+    {k:'婦癌醫師評估',x:'症狀、CA-125、腹盆腔 CT 與胸部影像',src:'nact'},
+    {k:'不足以開始治療',x:'僅靠 CA-125、影像或腹水細胞學',src:'nact'},
+    {k:'本頁範圍',x:'侵襲性上皮性癌；邊緣性與非上皮性腫瘤需獨立評估'}]},
+   {t:'組織確認',s:'路徑決定取得時機',l:[
+    {k:'計畫新輔助化療',x:'開始前必須有侵襲癌的組織學確認，優先影像導引核心針切片',src:'nact',p:{setting:'new',stage:'advanced',tissue:'pending',resect:'unlikely'},c:'nact-biopsy'},
+    {k:'計畫初次減積',x:'病理可由手術取得；若改走新輔助化療，須先有組織確認',src:'nact',p:{setting:'new',stage:'advanced',tissue:'pending',resect:'likely'},c:'pcs'},
+    {k:'疑似早期',x:'不宜術前經皮穿刺，以免包膜破裂；病理由分期手術取得',src:'esgo',p:{setting:'new',stage:'early',tissue:'pending'},c:'early'}]},
+   {t:'組織型別',s:'先確認是否適用此路徑',l:[
+    {k:'高級別漿液性／類子宮內膜癌',x:'試驗證據的主要來源'},
+    {k:'低惡性度漿液性、亮細胞、黏液性',x:'對化療、PARP 抑制劑與 mirvetuximab 的反應不同，須獨立評估',p:{setting:'new',stage:'advanced',tissue:'otherEpi',resect:'unknown'},c:'assess'},
+    {k:'邊緣性、生殖細胞、性索間質',x:'不套用此路徑；婦癌病理複核並提交多專科會議',src:'nci',p:{setting:'new',tissue:'nonEpi'},c:'nonEpi'}]},
+   {t:'FIGO 2014 分期',s:'三種原發部位共用',l:[
+    {k:'I',x:'IA 單側、包膜完整；IB 雙側；IC1 術中溢出；IC2 術前破裂或表面腫瘤；IC3 腹水／沖洗陽性',src:'figo',p:{setting:'new',stage:'early'},c:'early'},
+    {k:'II',x:'IIA 侵犯子宮／輸卵管；IIB 其他骨盆腹腔內組織',src:'figo',p:{setting:'new',stage:'early'},c:'early'},
+    {k:'III',x:'IIIA1 僅後腹膜淋巴結（i ≤10 mm、ii >10 mm）；IIIA2 骨盆外顯微腹膜；IIIB 肉眼 ≤2 cm；IIIC >2 cm（含肝脾包膜）',src:'figo',p:{setting:'new',stage:'advanced'},c:'assess'},
+    {k:'IV',x:'IVA 胸水細胞學陽性；IVB 肝脾實質、腹腔外器官、腹股溝及腹腔外淋巴結',src:'figo',p:{setting:'new',stage:'advanced'},c:'assess'},
+    {k:'記錄',x:'組織型別與原發部位；臨床推測期別須與手術病理期別區分',src:'figo'}]},
+   {t:'可切除性與體能',s:'決定 PCS 或 NACT',l:[
+    {k:'病灶分布',x:'CA-125、腹盆腔 CT 及胸部影像，判斷無肉眼殘存的可能性',src:'nact',p:{setting:'new',stage:'advanced',tissue:'hg',resect:'unknown'},c:'assess'},
+    {k:'手術風險',x:'體能狀態、營養、共病與圍手術期風險',src:'nact'},
+    {k:'結論',x:'高機率完整減積 → PCS；不易完整減積或風險高 → NACT',src:'nact'}]},
+   {t:'分子檢測',s:'診斷時即規劃',l:[
+    {k:'BRCA1/2',x:'所有病人提供胚系與腫瘤檢測',src:'parp'},
+    {k:'HRD',x:'BRCA 陰性時，以 FDA 核准或前瞻驗證的伴隨診斷檢測',src:'parp'},
+    {k:'BRCA 陽性',x:'轉介遺傳諮詢與家族串聯檢測',src:'parp'},
+    {k:'FRα',x:'鉑類抗性時以經驗證的 IHC 檢測（≥75% 腫瘤細胞 2+／3+）',src:'esmo'},
+    {k:'事前審查',x:'9.85.1(4)：PARP 維持須附 BRCA／HRD 報告，診斷時即送檢',tw:true}]}
+  ],
+  tx:[
+   {t:'I–II 期',s:'完整手術分期，依病理風險輔助',l:[
+    {k:'手術分期',x:'腹膜沖洗、全子宮及雙側附件、大網膜、腹膜多點切片及骨盆／主動脈旁淋巴結評估',src:'esgo',p:{setting:'new',stage:'early',tissue:'hg'},c:'early'},
+    {k:'可考慮追蹤',x:'低惡性度、嚴格選擇的 IA／IB',src:'esgo'},
+    {k:'輔助化療',x:'高級別或 IC 以上依病理風險討論含鉑化療',src:'esgo'},
+    {k:'PARP 維持',x:'早期不建議',src:'parp',p:{setting:'response',stage:'early',tissue:'hg'},c:'early-maint'}]},
+   {t:'初次減積 PCS',s:'適合手術且高機率完整減積',l:[
+    {k:'手術',x:'目標無肉眼殘存',src:'nact',p:{setting:'new',stage:'advanced',tissue:'hg',resect:'likely'},c:'pcs'},
+    {k:'術後',x:'含鉑雙藥共 6 個療程，可加 bevacizumab',src:'nact'},
+    {k:'同步',x:'完成 BRCA／HRD 檢測，規劃一線維持',src:'nact'}]},
+   {t:'新輔助化療 → 間隔減積',s:'不易完整減積或風險高',l:[
+    {k:'化療',x:'carboplatin＋paclitaxel',src:'nact',p:{setting:'new',stage:'advanced',tissue:'hg',resect:'unlikely'},c:'nact'},
+    {k:'ICS 時機',x:'反應或穩定者，不超過 4 個療程後',src:'nact'},
+    {k:'HIPEC',x:'III 期、體能良好且腎功能足夠者，ICS 時可考慮',src:'nact'},
+    {k:'術後',x:'化療至共 6 個療程，可加 bevacizumab，之後維持治療',src:'nact'},
+    {k:'期間進展',x:'再次切片確認診斷，補做分子檢測，考慮其他化療、試驗或安寧照護',src:'nact'}]},
+   {t:'一線維持：前提',s:'III–IV 期、含鉑後有反應',l:[
+    {k:'時機',x:'PARP 維持應優先用於第一次臨床緩解',src:'parp'},
+    {k:'未達 CR／PR',x:'穩定或進展視為持續性疾病，改走復發路徑討論',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'sd'},c:'no-response'},
+    {k:'報告未出',x:'先完成 BRCA／HRD 檢測再決定',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'cr',biomarker:'unknown'},c:'test'},
+    {k:'安全性',x:'監測血球、MDS／AML 與肺部併發症',src:'parp'}]},
+   {t:'一線維持：依 BRCA／HRD',s:'三條分支',l:[
+    {k:'BRCA 變異',x:'PARP 單藥：olaparib 2 年或 niraparib 3 年（ESMO 另列 rucaparib 2 年）',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'cr',biomarker:'brca',bev:'no'},c:'brca'},
+    {k:'BRCA 野生型、HRD 陽性',x:'niraparib 單藥（ESMO 另列 rucaparib）；olaparib 單藥一線證據限 BRCA 變異',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'cr',biomarker:'hrd',bev:'no'},c:'hrd'},
+    {k:'一線用過 bevacizumab',x:'BRCA 變異或 HRD 陽性可選 olaparib＋bevacizumab（2 年／共 15 個月）',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'cr',biomarker:'hrd',bev:'yes'},c:'hrd'},
+    {k:'HRD 陰性：ASCO',x:'不建議 PARP 維持',src:'parp',p:{setting:'response',stage:'advanced',tissue:'hg',response:'cr',biomarker:'negative'},c:'hrd-neg'},
+    {k:'HRD 陰性：ESMO',x:'可考慮 bevacizumab 15 個月、rucaparib 2 年或 niraparib 3 年；也可觀察',src:'esmo'}]},
+   {t:'復發：先判斷鉑類',s:'不以單次 CA-125 啟動',l:[
+    {k:'核對',x:'影像或臨床進展、前次含鉑反應與間隔、累積毒性、PARP 暴露、病人目標',src:'relapse',p:{setting:'relapse',tissue:'hg'},c:'relapse-assess'},
+    {k:'補做',x:'未做過者補 BRCA／HRD 與 FRα',src:'relapse'},
+    {k:'HIPEC',x:'復發時加做的證據不足',src:'relapse'}]},
+   {t:'復發：適合鉑類',s:'含鉑雙藥 ± bevacizumab',l:[
+    {k:'化療',x:'carboplatin 合併 PLD、paclitaxel 或 gemcitabine；可加 bevacizumab 並接續維持',src:'relapse',p:{setting:'relapse',tissue:'hg',platinum:'eligible'},c:'plat-sens'},
+    {k:'二次減積',x:'高度可能完整切除時可討論（如 AGO 評分）',src:'relapse',p:{setting:'relapse',tissue:'hg',platinum:'eligible',secondary:true},c:'plat-sens'},
+    {k:'PARP 維持',x:'限未用過 PARP、BRCA 變異、對含鉑有反應者',src:'parp',p:{setting:'relapse',tissue:'hg',platinum:'eligible',biomarker:'brca'},c:'plat-sens'},
+    {k:'PARP 限制',x:'試驗外不作復發單藥治療，也不與化療、其他標靶或免疫藥物合併',src:'parp'}]},
+   {t:'復發：不適合鉑類',s:'抗性、難治或不耐受',l:[
+    {k:'FRα 高表現',x:'高級別疾病 → mirvetuximab；ESMO 條件 PFI <6 個月、≥75% 2+／3+、既往 1–3 線',src:'relapse',p:{setting:'relapse',tissue:'hg',platinum:'ineligible',fra:true,lines:'1-3'},c:'mirv'},
+    {k:'眼科監測',x:'角膜病變、視力模糊；預防性潤滑眼藥並依分級調整劑量',src:'relapse'},
+    {k:'其他選項',x:'PLD、paclitaxel、化療合併 bevacizumab、relacorilant＋nab-paclitaxel；gemcitabine 單藥為條件性替代',src:'relapse',p:{setting:'relapse',tissue:'hg',platinum:'ineligible'},c:'plat-res'},
+    {k:'照護目標',x:'評估症狀與腸阻塞風險，及早整合試驗與安寧緩和照護',src:'relapse'}]},
+   {t:'台灣健保',s:'第九節 115.9.22',tw:true,l:[
+    {k:'化療',x:'carboplatin 9.2、paclitaxel 9.5.1、gemcitabine 9.4',tw:true},
+    {k:'復發非鉑',x:'PLD 9.14、topotecan 9.16.1',tw:true},
+    {k:'Bevacizumab 一線',x:'9.37.3(1)：限第四期初次手術切除後，上限 22 個療程',tw:true},
+    {k:'Bevacizumab 復發',x:'9.37.3(2)：6–12 個月內復發、一線未申請、併 carboplatin＋paclitaxel，上限 15 個療程',tw:true},
+    {k:'Olaparib',x:'9.85.1(1)：BRCA 變異、III–IV 期、一線含鉑有反應，限 2 年',tw:true},
+    {k:'Niraparib',x:'9.85.1(2)：BRCA 變異或 HRD 陽性，限 2 年（與國際建議的 3 年不同）',tw:true},
+    {k:'Olaparib＋bevacizumab',x:'9.85.1(3)：一線合併 bevacizumab 有反應的 HRD，bevacizumab 上限 15 個月',tw:true},
+    {k:'未給付',x:'HRD 陰性與復發後 PARP 維持',tw:true},
+    {k:'第九節無條文',x:'rucaparib、mirvetuximab',tw:true}]}
+  ]
+};
+/*MAP-END*/
+
+root.OV={pathway,cases,mindMap,quiz,quizAdvanced,SRC,nhi,nhiSummary,NHI_VERSION,NHI_URL};
 })(typeof globalThis!=='undefined'?globalThis:this);
